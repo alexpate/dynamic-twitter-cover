@@ -1,0 +1,20 @@
+{
+  "name": "dynamic-twitter-cover",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexpate/dynamic-twitter-cover.git"
+  },
+  "author": "Alex Pate",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexpate/dynamic-twitter-cover/issues"
+  },
+  "homepage": "https://github.com/alexpate/dynamic-twitter-cover#readme",
+  "dependencies": {
+    "sharp": "^0.23.0",
+    "twitter": "^1.7.1"
+  }
+}
