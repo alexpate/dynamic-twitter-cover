@@ -1,0 +1,24 @@
+name: Generate Cover Image
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          version: 12.x
+      - name: Install dependencies
+        run: npm install
+      - name: Run the script
+        run: node index.js
+        env:
+          TWITTER_CONSUMER_KEY: ${{secrets.TWITTER_CONSUMER_KEY}}
+          TWITTER_CONSUMER_SECRET: ${{secrets.TWITTER_CONSUMER_SECRET}}
+          TWITTER_ACCESS_KEY: ${{secrets.TWITTER_ACCESS_KEY}}
+          TWITTER_ACCESS_SECRET: ${{secrets.TWITTER_ACCESS_SECRET}}

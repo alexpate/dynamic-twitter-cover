@@ -73,6 +73,5 @@ async function postToTwitter(imageBuffer) {
 
 (async () => {
   const image = await generateImage();
-  console.log(image);
   await postToTwitter(image);
 })();
