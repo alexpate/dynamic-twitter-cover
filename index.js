@@ -9,33 +9,29 @@ const GRADIENTS = {
   sunset: ['#412b38', '#eb622b'],
 };
 
-async function generateImage() {
-  const currentHour = new Date(new Date().toUTCString()).getHours();
-  let gradient;
+function generateImage() {
+  return new Promise(async resolve => {
+    const currentHour = new Date(new Date().toUTCString()).getHours();
 
-  switch (true) {
-    case currentHour >= 22 || currentHour <= 4:
-      gradient = GRADIENTS['night'];
-      break;
-    case currentHour > 4 && currentHour <= 8:
-      gradient = GRADIENTS['sunrise'];
-      break;
-    case currentHour > 8 && currentHour <= 10:
-      gradient = GRADIENTS['morning'];
-      break;
-    case currentHour > 11 && currentHour <= 20:
-      gradient = GRADIENTS['day'];
-      break;
-    case currentHour > 20 && currentHour <= 22:
-      gradient = GRADIENTS['sunset'];
-      break;
-    default:
-      gradient = GRADIENTS['day'];
-  }
+    const gradient = (() => {
+      switch (true) {
+        case currentHour >= 22 || currentHour <= 4:
+          return GRADIENTS['night'];
+        case currentHour > 4 && currentHour <= 8:
+          return GRADIENTS['sunrise'];
+        case currentHour > 8 && currentHour <= 10:
+          return GRADIENTS['morning'];
+        case currentHour > 10 && currentHour <= 20:
+          return GRADIENTS['day'];
+        case currentHour > 20 && currentHour <= 22:
+          return GRADIENTS['sunset'];
+        default:
+          return GRADIENTS['day'];
+      }
+    })();
 
-  const SVG = Buffer.from(`
-    <svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
-      <g>
+    const SVG = Buffer.from(`
+      <svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="${gradient[0]}"/>
@@ -43,20 +39,20 @@ async function generateImage() {
           </linearGradient>
         </defs>
         <rect fill="url(#gradient)" x="0" y="0" width="1500" height="500"/>
-      </g>
-    </svg>
-  `);
+      </svg>
+    `);
 
-  const image = await sharp(SVG)
-    .png()
-    .toBuffer();
+    const image = await sharp(SVG)
+      .png()
+      .toBuffer();
 
-  const base64 = image.toString('base64');
+    const base64 = image.toString('base64');
 
-  return base64;
+    resolve(base64);
+  });
 }
 
-async function postToTwitter(imageBuffer) {
+async function postToTwitter(base64Image) {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -66,12 +62,12 @@ async function postToTwitter(imageBuffer) {
 
   client.post(
     'account/update_profile_banner',
-    {banner: imageBuffer},
+    {banner: base64Image},
     (response, error) => error && console.log(error)
   );
 }
 
 (async () => {
   const image = await generateImage();
-  await postToTwitter(image);
+  postToTwitter(image);
 })();
